@@ -47,19 +47,61 @@ window.geometry("300x200")
 fa = FiniteAutomaton()
 
 def design_fa():
-    # Design a finite automaton
-    fa.states = {"q0", "q1", "q2"}
-    fa.alphabet = {"a", "b"}
-    fa.transitions = {
-        ("q0", "a"): "q1",
-        ("q1", "b"): "q2",
-        ("q2", "a"): "q0"
-    }
-    fa.start_state = "q0"
-    fa.accept_states = {"q2"}
+    btn_design.config(state=tk.DISABLED)  # Disable the button
 
-    messagebox.showinfo("Information", "Finite Automaton (FA) designed successfully!")
+    popup = tk.Toplevel(window)
+    popup.title("Finite Automaton Designer")
 
+    def close_popup():
+        btn_design.config(state=tk.NORMAL)  # Enable the button
+        popup.destroy()
+
+    popup.protocol("WM_DELETE_WINDOW", close_popup)  # Handle window close event
+
+    # Create labels and entry widgets for user input
+    states_label = tk.Label(popup, text="States (comma-separated):")
+    states_label.pack()
+    states_entry = tk.Entry(popup)
+    states_entry.pack()
+
+    alphabet_label = tk.Label(popup, text="Alphabet (comma-separated):")
+    alphabet_label.pack()
+    alphabet_entry = tk.Entry(popup)
+    alphabet_entry.pack()
+
+    transitions_label = tk.Label(popup, text="Transitions (source, input, destination; semicolon-separated):")
+    transitions_label.pack()
+    transitions_entry = tk.Entry(popup)
+    transitions_entry.pack()
+
+    initial_state_label = tk.Label(popup, text="Initial State:")
+    initial_state_label.pack()
+    initial_state_entry = tk.Entry(popup)
+    initial_state_entry.pack()
+
+    final_states_label = tk.Label(popup, text="Final States (comma-separated):")
+    final_states_label.pack()
+    final_states_entry = tk.Entry(popup)
+    final_states_entry.pack()
+
+    def create_fa():
+        # Retrieve user input from entry widgets
+        states = states_entry.get().split(',')
+        alphabet = alphabet_entry.get().split(',')
+        transitions = [tuple(transition.split(',')) for transition in transitions_entry.get().split(';')]
+        initial_state = initial_state_entry.get()
+        final_states = final_states_entry.get().split(',')
+
+        # Call your function to create the FA with the provided input
+        # Example: create_fa(states, alphabet, transitions, initial_state, final_states)
+        # Replace this line with your own function call
+
+        close_popup()  # Close the popup window
+
+    # Create a button to create the FA
+    btn_create = tk.Button(popup, text="Create FA", command=create_fa)
+    btn_create.pack(pady=5)
+    
 def test_deterministic():
     # Test if a FA is deterministic or non-deterministic
     if fa.is_deterministic():
@@ -84,7 +126,7 @@ def construct_dfa():
 def minimize_dfa():
     # Minimize the DFA
     fa.minimize()
-    messagebox.showinfo("Information", "DFA minimized")
+    messagebox.showinfo("Information", "DFA minimized!")
 
 # Create buttons for each functionality
 btn_design = tk.Button(window, text="Design FA", command=design_fa)
