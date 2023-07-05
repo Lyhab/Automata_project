@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
 
+import mysql.connector
+
 class FiniteAutomaton:
     def __init__(self):
         self.states = set()
@@ -59,6 +61,41 @@ def design_fa():
 
     popup.protocol("WM_DELETE_WINDOW", close_popup)  # Handle window close event
 
+    def create_fa():
+        # Retrieve user input from entry widgets
+        states = states_entry.get().split(',')
+        alphabet = alphabet_entry.get().split(',')
+        transitions = [tuple(transition.split(',')) for transition in transitions_entry.get().split(';')]
+        initial_state = initial_state_entry.get()
+        final_states = final_states_entry.get().split(',')
+
+        db_con = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="12345678",
+            database="automata"
+        )
+        
+        # Create a cursor
+        cursor = db_con.cursor()
+        
+        # Insert data into the table
+        insert_query = "INSERT INTO finite_automata (states, alphabet, transitions, initial_state, final_states) VALUES (%s, %s, %s, %s, %s)"
+        data = (states, alphabet, transitions, initial_state, final_states)
+        cursor.execute(insert_query, data)
+        
+        # Commit the changes
+        db_con.commit()
+        
+        # Close the cursor and connection
+        db_con.close()
+
+        # Call your function to create the FA with the provided input
+        # Example: create_fa(states, alphabet, transitions, initial_state, final_states)
+        # Replace this line with your own function call
+
+        close_popup()  # Close the popup window
+
     # Create labels and entry widgets for user input
     states_label = tk.Label(popup, text="States (Q):")
     states_label.pack()
@@ -84,20 +121,6 @@ def design_fa():
     final_states_label.pack()
     final_states_entry = tk.Entry(popup)
     final_states_entry.pack()
-
-    def create_fa():
-        # Retrieve user input from entry widgets
-        states = states_entry.get().split(',')
-        alphabet = alphabet_entry.get().split(',')
-        transitions = [tuple(transition.split(',')) for transition in transitions_entry.get().split(';')]
-        initial_state = initial_state_entry.get()
-        final_states = final_states_entry.get().split(',')
-
-        # Call your function to create the FA with the provided input
-        # Example: create_fa(states, alphabet, transitions, initial_state, final_states)
-        # Replace this line with your own function call
-
-        close_popup()  # Close the popup window
 
     # Create a button to create the FA
     btn_create = tk.Button(popup, text="Create", command=create_fa)
