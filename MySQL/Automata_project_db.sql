@@ -8,6 +8,3 @@ create table finite_automata(
     initial_state varchar(50) not null,
     final_states varchar(50) not null
 );
-
-drop table finite_automata;
-select * from finite_automata;
