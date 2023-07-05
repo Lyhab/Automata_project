@@ -80,19 +80,15 @@ def design_fa():
         cursor = db_con.cursor()
         
         # Insert data into the table
-        insert_query = "INSERT INTO finite_automata (states, alphabet, transitions, initial_state, final_states) VALUES (%s, %s, %s, %s, %s)"
-        data = (states, alphabet, transitions, initial_state, final_states)
-        cursor.execute(insert_query, data)
+        insertion = "INSERT INTO finite_automata (states, alphabet, transitions, initial_state, final_states) VALUES (%s, %s, %s, %s, %s)"
+        data = ("q0,q1,q2", "0,1", "q0,0,q1;q0,1,q2;q1,0,q2;q2,1,q2", "q0", "q1,q2")
+        cursor.execute(insertion, data)
         
         # Commit the changes
         db_con.commit()
         
         # Close the cursor and connection
         db_con.close()
-
-        # Call your function to create the FA with the provided input
-        # Example: create_fa(states, alphabet, transitions, initial_state, final_states)
-        # Replace this line with your own function call
 
         close_popup()  # Close the popup window
 
