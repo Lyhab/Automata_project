@@ -61,13 +61,26 @@ def design_fa():
 
     popup.protocol("WM_DELETE_WINDOW", close_popup)  # Handle window close event
 
+    states = []
+    alphabet = []
+    initial_state = None
+    final_states = []
+    transitions = []
+
     def create_fa():
         # Retrieve user input from entry widgets
-        states = states_entry.get().split(',')
-        alphabet = alphabet_entry.get().split(',')
-        transitions = [tuple(transition.split(',')) for transition in transitions_entry.get().split(';')]
-        initial_state = initial_state_entry.get()
-        final_states = final_states_entry.get().split(',')
+        states_input = states_entry.get().split(',')
+        alphabet_input = alphabet_entry.get().split(',')
+        transitions_input = [tuple(transition.split(',')) for transition in transitions_entry.get().split(';')]
+        initial_state_input = initial_state_entry.get()
+        final_states_input = final_states_entry.get().split(',')
+
+        # Store the input in variables
+        states.extend(states_input)
+        alphabet.extend(alphabet_input)
+        initial_state = initial_state_input
+        final_states.extend(final_states_input)
+        transitions.extend(transitions_input)
 
         db_con = mysql.connector.connect(
             host="localhost",
@@ -81,7 +94,7 @@ def design_fa():
         
         # Insert data into the table
         insertion = "INSERT INTO finite_automata (states, alphabet, transitions, initial_state, final_states) VALUES (%s, %s, %s, %s, %s)"
-        data = ("q0,q1,q2", "0,1", "q0,0,q1;q0,1,q2;q1,0,q2;q2,1,q2", "q0", "q1,q2")
+        data = (', '.join(states), ', '.join(alphabet), '  ;  '.join(', '.join(l) for l in transitions), initial_state, ', '.join(final_states))
         cursor.execute(insertion, data)
         
         # Commit the changes
