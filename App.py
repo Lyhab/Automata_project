@@ -41,7 +41,7 @@ class FiniteAutomaton:
 # Create the main application window
 window = tk.Tk()
 window.title("Finite Automaton (FA) Manager")
-window.geometry("300x200")
+window.geometry("300x210")
 
 # Create a FiniteAutomaton instance
 fa = FiniteAutomaton()
@@ -51,6 +51,7 @@ def design_fa():
 
     popup = tk.Toplevel(window)
     popup.title("Finite Automaton Designer")
+    popup.geometry("300x300")
 
     def close_popup():
         btn_design.config(state=tk.NORMAL)  # Enable the button
@@ -59,27 +60,27 @@ def design_fa():
     popup.protocol("WM_DELETE_WINDOW", close_popup)  # Handle window close event
 
     # Create labels and entry widgets for user input
-    states_label = tk.Label(popup, text="States (comma-separated):")
+    states_label = tk.Label(popup, text="States (Q):")
     states_label.pack()
     states_entry = tk.Entry(popup)
     states_entry.pack()
 
-    alphabet_label = tk.Label(popup, text="Alphabet (comma-separated):")
+    alphabet_label = tk.Label(popup, text="Alphabet (X):")
     alphabet_label.pack()
     alphabet_entry = tk.Entry(popup)
     alphabet_entry.pack()
 
-    transitions_label = tk.Label(popup, text="Transitions (source, input, destination; semicolon-separated):")
+    transitions_label = tk.Label(popup, text="Transitions (δ):")
     transitions_label.pack()
     transitions_entry = tk.Entry(popup)
     transitions_entry.pack()
 
-    initial_state_label = tk.Label(popup, text="Initial State:")
+    initial_state_label = tk.Label(popup, text="Initial State (q0):")
     initial_state_label.pack()
     initial_state_entry = tk.Entry(popup)
     initial_state_entry.pack()
 
-    final_states_label = tk.Label(popup, text="Final States (comma-separated):")
+    final_states_label = tk.Label(popup, text="Final States (F):")
     final_states_label.pack()
     final_states_entry = tk.Entry(popup)
     final_states_entry.pack()
@@ -99,7 +100,7 @@ def design_fa():
         close_popup()  # Close the popup window
 
     # Create a button to create the FA
-    btn_create = tk.Button(popup, text="Create FA", command=create_fa)
+    btn_create = tk.Button(popup, text="Create", command=create_fa)
     btn_create.pack(pady=5)
     
 def test_deterministic():
