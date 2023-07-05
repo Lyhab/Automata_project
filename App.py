@@ -98,17 +98,17 @@ def design_fa():
 
 
 def test_deterministic():
-    btn_deterministic.config(state=tk.DISABLED)  # Disable the button
+    btn_deterministic.config(state=tk.DISABLED)
 
     popup = tk.Toplevel(window)
     popup.title("Finite Automaton Designer")
     popup.geometry("300x100")
 
     def close_popup():
-        btn_deterministic.config(state=tk.NORMAL)  # Enable the button
+        btn_deterministic.config(state=tk.NORMAL)
         popup.destroy()
 
-    popup.protocol("WM_DELETE_WINDOW", close_popup)  # Handle window close event
+    popup.protocol("WM_DELETE_WINDOW", close_popup)
 
     # Test if a FA is deterministic or non-deterministic
     def check_deterministic(selected_fa):
@@ -139,13 +139,12 @@ def test_deterministic():
                 cursor.close()
                 connection.close()
 
-        close_popup()  # Close the popup window
+        close_popup()
 
     def on_button_click():
         selected_fa = entry.get()
         check_deterministic(selected_fa)
 
-    # GUI Setup
     label = tk.Label(popup, text="Enter FA ID:")
     label.pack()
 
