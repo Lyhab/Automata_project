@@ -3,50 +3,10 @@ from tkinter import messagebox
 
 import mysql.connector
 
-class FiniteAutomaton:
-    def __init__(self):
-        self.states = set()
-        self.alphabet = set()
-        self.transitions = {}
-        self.start_state = None
-        self.accept_states = set()
-
-    def is_deterministic(self):
-        # Check if the FA is deterministic or non-deterministic
-        for state in self.states:
-            for symbol in self.alphabet:
-                if (state, symbol) in self.transitions and len(self.transitions[(state, symbol)]) > 1:
-                    return False
-        return True
-
-    def accepts_string(self, input_string):
-        # Test if a string is accepted by the FA
-        current_state = self.start_state
-        for symbol in input_string:
-            if (current_state, symbol) in self.transitions:
-                current_state = self.transitions[(current_state, symbol)]
-            else:
-                return False
-        return current_state in self.accept_states
-
-    def construct_equivalent_dfa(self):
-        # Construct an equivalent DFA from an NFA
-        dfa = FiniteAutomaton()
-        # ...
-        return dfa
-
-    def minimize(self):
-        # Minimize the DFA
-        # ...
-        return self
-
 # Create the main application window
 window = tk.Tk()
 window.title("Finite Automaton (FA) Manager")
 window.geometry("300x210")
-
-# Create a FiniteAutomaton instance
-fa = FiniteAutomaton()
 
 def design_fa():
     btn_design.config(state=tk.DISABLED)  # Disable the button
@@ -135,12 +95,66 @@ def design_fa():
     btn_create = tk.Button(popup, text="Create", command=create_fa)
     btn_create.pack(pady=5)
     
+
+
 def test_deterministic():
+    btn_deterministic.config(state=tk.DISABLED)
+
+    popup = tk.Toplevel(window)
+    popup.title("Finite Automaton Designer")
+    popup.geometry("300x100")
+
+    def close_popup():
+        btn_deterministic.config(state=tk.NORMAL)
+        popup.destroy()
+
+    popup.protocol("WM_DELETE_WINDOW", close_popup)
+
     # Test if a FA is deterministic or non-deterministic
-    if fa.is_deterministic():
-        messagebox.showinfo("Information", "The FA is deterministic")
-    else:
-        messagebox.showinfo("Information", "The FA is non-deterministic")
+    def check_deterministic(selected_fa):
+        try:
+            connection = mysql.connector.connect(
+                host='localhost',
+                user='root',
+                password='12345678',
+                database='automata'
+            )
+
+            cursor = connection.cursor()
+            query = "SELECT id, transitions FROM finite_automata WHERE id=%s"
+            cursor.execute(query, (selected_fa,))
+            result = cursor.fetchone()
+
+            if not result:
+                messagebox.showinfo("ID Not Found", f"ID '{selected_fa}' not found in the database.")
+            else:
+                name, is_deterministic = result
+                messagebox.showinfo("ID Information", f"ID: {id}\nDeterministic: {'Yes' if is_deterministic else 'No'}")
+
+        except mysql.connector.Error as error:
+            messagebox.showerror("Database Error", f"An error occurred while connecting to the database: {error}")
+
+        finally:
+            if connection.is_connected():
+                cursor.close()
+                connection.close()
+
+        close_popup()
+
+    def on_button_click():
+        selected_fa = entry.get()
+        check_deterministic(selected_fa)
+
+    label = tk.Label(popup, text="Enter FA ID:")
+    label.pack()
+
+    entry = tk.Entry(popup)
+    entry.pack()
+
+    button = tk.Button(popup, text="Check Deterministic", command=on_button_click)
+    button.pack()
+
+
 
 def test_acceptance():
     # Test if a string is accepted by an FA
