@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 import mysql.connector
+import pandas as pd
 
 # Create the main application window
 window = tk.Tk()
