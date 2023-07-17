@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
 
 import mysql.connector
 import pandas as pd
@@ -8,6 +9,7 @@ import pandas as pd
 window = tk.Tk()
 window.title("Finite Automaton (FA) Manager")
 window.geometry("300x210")
+popup = False
 
 def design_fa():
     btn_design.config(state=tk.DISABLED)  # Disable the button
@@ -99,61 +101,172 @@ def design_fa():
 
 
 def test_deterministic():
-    btn_deterministic.config(state=tk.DISABLED)
+    global popup
 
-    popup = tk.Toplevel(window)
-    popup.title("Finite Automaton Designer")
-    popup.geometry("300x100")
+    # Check if the window is already open
+    if popup:
+        return
 
-    def close_popup():
-        btn_deterministic.config(state=tk.NORMAL)
+    try:
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='12345678',
+            database='automata'
+        )
+
+        # Replace 'your_table_name' with the name of your table
+        table_name = 'finite_automata'
+
+        # Fetch the table data from the database
+        cursor = connection.cursor()
+        cursor.execute(f"SELECT * FROM {table_name}")
+        rows = cursor.fetchall()
+        columns = [column[0] for column in cursor.description]
+
+        # Create a new window for displaying the table
+        popup = tk.Toplevel()
+        popup.title("Table Viewer")
+        popup.protocol("WM_DELETE_WINDOW", enable_button)
+
+        # Disable the "View Table" button
+        btn_deterministic.config(state="disabled")
+
+        # Create a Treeview widget to display the table
+        treeview = ttk.Treeview(popup, columns=columns, show='headings')
+
+        # Set up the columns
+        treeview['columns'] = columns
+        column_widths = [50, 125, 100, 400, 100, 100]  # Set the desired widths for each column
+        for column, width in zip(columns, column_widths):
+            treeview.heading(column, text=column)
+            treeview.column(column, width=width)
+
+        # Insert the data into the table
+        for row in rows:
+            treeview.insert("", tk.END, values=row)
+
+        # Add a scrollbar
+        scrollbar = ttk.Scrollbar(popup, orient="vertical", command=treeview.yview)
+        treeview.configure(yscroll=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+
+        treeview.pack(expand=True, fill="both")
+
+        # Create a function to check the ID
+        def check_id():
+            id = id_entry.get()
+            result = check_deterministic(id)
+            if not result:
+                result_label.config(text=f"ID '{id}' hasn't existed yet.")
+            else:
+                is_deterministic = result
+                result_label.config(text=f"ID '{id}' is {'deterministic' if is_deterministic else 'not deterministic'}.")
+
+        # Create an entry widget and button to enter and check the ID
+        id_frame = tk.Frame(popup)
+        id_frame.pack(pady=10)
+
+        id_label = tk.Label(id_frame, text="Enter ID:")
+        id_label.pack(side="left")
+
+        id_entry = tk.Entry(id_frame)
+        id_entry.pack(side="left")
+
+        check_button = tk.Button(id_frame, text="Check", command=check_id)
+        check_button.pack(side="left")
+
+        # Create a label to display the result
+        result_label = tk.Label(popup, text="")
+        result_label.pack()
+
+        # Wait for the window to be closed
+        popup.wait_window(popup)
+
+    except mysql.connector.Error as error:
+        tk.messagebox.showerror("Database Error", f"An error occurred while connecting to the database: {error}")
+
+    finally:
+        if connection.is_connected():
+            connection.close()
+
+def enable_button():
+    global popup
+
+    # Enable the "View Table" button
+    btn_deterministic.config(state="normal")
+    if popup is not False:
         popup.destroy()
+    popup = False
 
-    popup.protocol("WM_DELETE_WINDOW", close_popup)
-
-    # Test if a FA is deterministic or non-deterministic
-    def check_deterministic(selected_fa):
-        try:
-            connection = mysql.connector.connect(
+def check_deterministic(id):
+    try:
+        # Replace the following with your MySQL database connection details
+        connection = mysql.connector.connect(
                 host='localhost',
                 user='root',
                 password='12345678',
                 database='automata'
             )
 
-            cursor = connection.cursor()
-            query = "SELECT id, transitions FROM finite_automata WHERE id=%s"
-            cursor.execute(query, (selected_fa,))
-            result = cursor.fetchone()
+        # Replace 'your_table_name' with the name of your table
+        table_name = 'finite_automata'
 
-            if not result:
-                messagebox.showinfo("ID Not Found", f"ID '{selected_fa}' not found in the database.")
-            else:
-                name, is_deterministic = result
-                messagebox.showinfo("ID Information", f"ID: {id}\nDeterministic: {'Yes' if is_deterministic else 'No'}")
+        # Replace 'your_id_column' with the column name containing the ID in your table
+        id_column = 'id'
 
-        except mysql.connector.Error as error:
-            messagebox.showerror("Database Error", f"An error occurred while connecting to the database: {error}")
+        # Query the table to check if the ID is deterministic
+        cursor = connection.cursor()
+        query = f"SELECT {id_column} FROM {table_name} WHERE {id_column} = %s"
+        cursor.execute(query, (id,))
+        result = cursor.fetchone()
 
-        finally:
-            if connection.is_connected():
-                cursor.close()
-                connection.close()
+        if result:
+            return True
+        else:
+            return False
 
-        close_popup()
+    except mysql.connector.Error as error:
+        # Handle the database error
+        print(f"An error occurred while connecting to the database: {error}")
+        return False
 
-    def on_button_click():
-        selected_fa = entry.get()
-        check_deterministic(selected_fa)
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
 
-    label = tk.Label(popup, text="Enter FA ID:")
-    label.pack()
 
-    entry = tk.Entry(popup)
-    entry.pack()
 
-    button = tk.Button(popup, text="Check Deterministic", command=on_button_click)
-    button.pack()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
