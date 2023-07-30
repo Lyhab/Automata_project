@@ -271,22 +271,13 @@ def check_deterministic(id):
 
 
 def test_acceptance():
-    # Test if a string is accepted by an FA
-    input_string = messagebox.askstring("Input", "Enter an input string:")
-    if input_string is not None:
-        if fa.accepts_string(input_string):
-            messagebox.showinfo("Information", "Accepted")
-        else:
-            messagebox.showinfo("Information", "Rejected")
+    exec(open('testPython/4_app.py').read())
 
 def construct_dfa():
     # Construct an equivalent DFA from an NFA
-    dfa = fa.construct_equivalent_dfa()
-    messagebox.showinfo("Information", "Equivalent DFA constructed")
+    exec(open('testPython/3_app.py').read())
 
 def minimize_dfa():
-    # Minimize the DFA
-    fa.minimize()
     messagebox.showinfo("Information", "DFA minimized!")
 
 # Create buttons for each functionality
@@ -299,7 +290,7 @@ btn_deterministic.pack(pady=5)
 btn_acceptance = tk.Button(window, text="Test Acceptance", command=test_acceptance)
 btn_acceptance.pack(pady=5)
 
-btn_dfa = tk.Button(window, text="Construct DFA", command=construct_dfa)
+btn_dfa = tk.Button(window, text="NFA to DFA", command=construct_dfa)
 btn_dfa.pack(pady=5)
 
 btn_minimize = tk.Button(window, text="Minimize DFA", command=minimize_dfa)
